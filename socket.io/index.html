@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+  </head>
+  <body style="background-color: darkkhaki;">
+    <form id="form" >
+      <input style="display: block;" type="text" name="name" placeholder="Name" />
+      <input style="display: block;" type="text" name="message" placeholder="Message" />
+      
+      <button type="submit">Send</button>
+    </form>
+
+    <div id="messages"></div>
+
+    <!-- підключити socket.io до серверу за допомогою CDN, тепер у глобальній області видимості клієнт має доступ до змінної io -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
+
+    <script>
+      // вказуємо шлях до нашого сервера; під капотом socket.io використовує http, тому треба встановити пакет cors
+      const socket = io("http://localhost:8080");
+
+      const formElement = document.querySelector("#form");
+      const messagesElement = document.querySelector("#messages");
+      
+      formElement.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        // зчитати name і message з форми
+        const name = event.target.name.value.trim();
+        const message = event.target.message.value.trim();
+        
+        // якщо name або message порожні, виходимо із функції
+        if (name === "" || message === "") {
+          return;
+        }
+
+        formElement.reset();
+      });
+
+      // функція для створення повідомлень корисувачів
+      function writeMessage(text) {
+        // створюємо елемент "p"
+        const line = document.createElement("p");
+        // записуємо у нього дані з форми
+        line.innerText = text;
+        // додаємо елемент в div з id "messages"
+        messagesElement.appendChild(line);
+      }
+
+      // виводимо повідомлення зі серверу на клієнт
+      socket.on("chatMessage", (message) => {
+        writeMessage(message);
+      })
+    </script>
+  </body>
+</html>
