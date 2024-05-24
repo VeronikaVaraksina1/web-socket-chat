@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+  </head>
+
+  <body style="background-color: blanchedalmond;">
+    <form id="form" >
+      <input style="display: block;" type="text" name="name" placeholder="Name" />
+      <input style="display: block;" type="text" name="message" placeholder="Message" />
+
+      <button type="submit">Send</button>
+    </form>
+
+    <div id="messages"></div>
+
+    <script>
+      // щоб підконектитися до сервера на клієнті (WebSocket - реалізація веб-сокетів в браузері; це частина Browser API)
+      const socket = new WebSocket("ws://localhost:8080");
+
+      const formElement = document.querySelector("#form");
+      const messagesElement = document.querySelector("#messages");
+      
+      formElement.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        // зчитати name і message
+        const name = event.target.name.value.trim();
+        const message = event.target.message.value.trim();
+        
+        // якщо name або message порожні, виходимо із функції
+        if (name === "" || message === "") {
+          return;
+        }
+
+        // створюємо повідомлення користувача, передаючи name і message з форми. Використовуємо JSON.stringify, бо метод send приймає тип string
+        socket.send(JSON.stringify({name, message}))
+
+        formElement.reset();
+      });
+
+      // функція для створення повідомлень корисувачів
+      function writeMessage(text) {
+        // створюємо елемент "p"
+        const line = document.createElement("p");
+        // записуємо у нього дані з форми
+        line.innerText = text;
+        // додаємо елемент в div з id "messages"
+        messagesElement.appendChild(line);
+      }
+
+      // щоб отримати меседж від сервера на клієнті. event.data - знаходиться меседж
+      socket.onmessage = event => {
+        writeMessage(event.data)
+      }
+    </script>
+
+  </body>
+</html>
