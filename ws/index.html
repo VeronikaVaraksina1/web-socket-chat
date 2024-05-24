@@ -26,7 +26,7 @@
       formElement.addEventListener("submit", (event) => {
         event.preventDefault();
 
-        // зчитати name і message
+        // зчитати name і message з форми
         const name = event.target.name.value.trim();
         const message = event.target.message.value.trim();
         
@@ -51,7 +51,7 @@
         messagesElement.appendChild(line);
       }
 
-      // щоб отримати меседж від сервера на клієнті. event.data - знаходиться меседж
+      // щоб отримати меседж від сервера на клієнті. в event.data - знаходиться меседж
       socket.onmessage = event => {
         writeMessage(event.data)
       }
